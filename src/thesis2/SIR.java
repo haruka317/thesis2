@@ -5,9 +5,10 @@ import java.util.ArrayList;
 
 
 public class SIR {
+	City[] city = new City[47];
+
 	public  void calc(int init, int nm, double b, double g, double h, double t) {
 		double p; //感染確率
-		City[] city = new City[47];
 		Virus v = new Virus(b,g);
 		Functions f = new Functions(v);
 
@@ -163,15 +164,15 @@ public class SIR {
 		for(double k = 0; k < t; k += h){
 			for(City c: city){
 				c.sc.add(c.s);
-				c.ic.add(c.i);
+				c.ic.add(c.i );
 				c.rc.add(c.r);
 				if(c.processing){
 					//processing = true の都市のみ計算
 					c.s = c.s + (h/6)*(c.k1[0] + 2*c.k2[0] + 2*c.k3[0] + c.k4[0]);
 					c.i = c.i + (h/6)*(c.k1[1] + 2*c.k2[1] + 2*c.k3[1] + c.k4[1]);
 					c.r = Math.max(0,1 - ( c.s + c.i ));
-					c.S = (int) (c.s*c.pop);
-					c.I = (int) (c.i*c.pop);
+					c.S = (int) (c.s * c.pop);
+					c.I = (int) (c.i * c.pop * h);
 					c.R = c.pop - (c.S + c.I);
 
 					c.k1[0] = f.dS(c.s,c.i,c.r,t);
