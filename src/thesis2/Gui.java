@@ -3,6 +3,7 @@ package thesis2;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,6 +21,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 public class Gui extends JFrame{
@@ -49,9 +51,11 @@ public class Gui extends JFrame{
 	double h;
 	double t;
 	Virus v;
+	City[] city;
 
-	public Gui(){
-		SIR sir = new SIR();
+	public Gui(City[] city){
+		SIR sir = new SIR(city);
+		this.city = city;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(250, 100, 1700, 1200);
 
@@ -69,7 +73,7 @@ public class Gui extends JFrame{
 	    p2.setBounds(1400, 0, 300, 1200);
 	    p2.setBorder(border2);
 
-	    String[] city = {"北海道","青森県","岩手県","宮城県","秋田県","山形県",
+	    String[] c = {"北海道","青森県","岩手県","宮城県","秋田県","山形県",
 	    		"福島県","茨城県","栃木県","群馬県","埼玉","千葉","東京","神奈川",
 	    		"新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県",
 	    		"静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県",
@@ -77,10 +81,10 @@ public class Gui extends JFrame{
 	    		"徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県",
 	    		"熊本県","大分県","宮崎県","鹿児島県","沖縄県" };
 
-	    this.combo1 = new JComboBox(city);
+	    this.combo1 = new JComboBox(c);
 	    combo1.setBounds(1300, 150, 200, 50);
 
-	    this.combo2 = new JComboBox(city);
+	    this.combo2 = new JComboBox(c);
 	    combo2.setBounds(1300, 300, 200, 50);
 
 	    this.label1 = new JLabel("感染率=");
@@ -109,15 +113,21 @@ public class Gui extends JFrame{
 
 
 	    ChartFactory.setChartTheme(StandardChartTheme.createLegacyTheme());
+
 	    JFreeChart chart =
 		  	      ChartFactory.createLineChart("感染者割合の推移",
                           "経過日数",
                           "割合",
-                          createData(),
+                          createData(2,2,2.0),
                           PlotOrientation.VERTICAL,
                           true,
                           false,
                           false);
+
+	    chart.getCategoryPlot().getDomainAxis().setTickLabelFont(new Font(Font.DIALOG, Font.ITALIC, 30));
+
+	    LegendTitle legend = chart.getLegend();
+	    legend.setItemFont(new Font("ＭＳ 明朝", Font.BOLD | Font.ITALIC, 20));
 
 		CategoryPlot plot = chart.getCategoryPlot();
 		plot.setBackgroundPaint(Color.ORANGE);
@@ -126,13 +136,19 @@ public class Gui extends JFrame{
 		//cpanel.setBounds(100, 100, 1000, 1000);
 		p1.add(cpanel,BorderLayout.CENTER);
 
-	    Virus v = new Virus();
-
 		add(btn1);
 		btn1.setBounds(1200,1000,400,75);
 		btn1.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
+				for(City c: city){
+					c.ic.clear();
+					c.sc.clear();
+					c.rc.clear();
+					c.s = 1;
+					c.i = 0.00000;
+					c.r = 0.00000;
+				}
 				int init = combo1.getSelectedIndex();
 				int nm = combo2.getSelectedIndex();
 				String str1 = text1.getText();
@@ -162,57 +178,13 @@ public class Gui extends JFrame{
 	    contentPane.add(p1);
 	    contentPane.add(p2);
 	}
- /*
-	  private DefaultCategoryDataset createData(){
+
+	  private DefaultCategoryDataset createData(int n, double t, double h){
 		    DefaultCategoryDataset data = new DefaultCategoryDataset();
-		    String[] series = {"米国", "中国", "インド"};
-		    String[] category = {"2005年", "2006年", "2007年"};
-
-		    data.addValue(300, series[0], category[0]);
-		    data.addValue(500, series[0], category[1]);
-		    data.addValue(400, series[0], category[2]);
-		    data.addValue(200, series[1], category[0]);
-		    data.addValue(600, series[1], category[1]);
-		    data.addValue(200, series[1], category[2]);
-		    data.addValue(100, series[2], category[0]);
-		    data.addValue(150, series[2], category[1]);
-		    data.addValue(700, series[2], category[2]);
-
-		    return data;
-
-
-		  String str;
-		  DefaultCategoryDataset data = new DefaultCategoryDataset();
-		  String[] series = {"北海道","青森県","岩手県","宮城県","秋田県","山形県",
-	    		"福島県","茨城県","栃木県","群馬県","埼玉","千葉","東京","神奈川",
-	    		"新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県",
-	    		"静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県",
-	    		"奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県",
-	    		"徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県",
-	    		"熊本県","大分県","宮崎県","鹿児島県","沖縄県" };
-
-		  for(int i = 0; i < c.ic.size() ; i++){
-			  str = String.valueOf(i*h);
-			  data.addValue(c.ic.get(i), series[c.id], str);
-
-		  return data;
-	  }
-		  }*/
-
-	  private DefaultCategoryDataset createData(){
-		    DefaultCategoryDataset data = new DefaultCategoryDataset();
-		    String[] series = {"米国", "中国", "インド"};
-		    String[] category = {"2005年", "2006年", "2007年"};
-
-		    data.addValue(300, series[0], category[0]);
-		    data.addValue(500, series[0], category[1]);
-		    data.addValue(400, series[0], category[2]);
-		    data.addValue(200, series[1], category[0]);
-		    data.addValue(600, series[1], category[1]);
-		    data.addValue(200, series[1], category[2]);
-		    data.addValue(100, series[2], category[0]);
-		    data.addValue(150, series[2], category[1]);
-		    data.addValue(700, series[2], category[2]);
+		    String str = city[2].name;
+		    for(int i = 0; i < 100; i++){
+		    	data.addValue(city[2].i,str, Double.toString(i*1.0));
+		    }
 		    return data;
 		 }
 }
